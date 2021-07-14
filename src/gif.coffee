@@ -104,7 +104,7 @@ class GIF extends EventEmitter
   spawnWorkers: ->
     if @options.providedWorkers
       numWorkers = @options.providedWorkers.length
-    else:
+    else
       numWorkers = Math.min(@options.workers, @frames.length)
 
     [@freeWorkers.length...numWorkers].forEach (i) =>
