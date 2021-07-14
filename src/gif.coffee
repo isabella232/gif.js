@@ -6,6 +6,7 @@ class GIF extends EventEmitter
   defaults =
     workerScript: 'gif.worker.js'
     workers: 2
+    providedWorkers: null # if workers are provided, use these instead of creating new ones
     repeat: 0 # repeat forever, -1 = repeat once
     background: '#fff'
     quality: 10 # pixel sample interval, lower is better
@@ -101,10 +102,18 @@ class GIF extends EventEmitter
   # private
 
   spawnWorkers: ->
-    numWorkers = Math.min(@options.workers, @frames.length)
+    if @options.providedWorkers
+      numWorkers = @options.providedWorkers.length
+    else:
+      numWorkers = Math.min(@options.workers, @frames.length)
+
     [@freeWorkers.length...numWorkers].forEach (i) =>
-      @log "spawning worker #{ i }"
-      worker = new Worker @options.workerScript
+      if @options.providedWorkers
+        worker = @options.providedWorkers[i]
+      else
+        @log "spawning worker #{ i }"
+        worker = new Worker @options.workerScript
+
       worker.onmessage = (event) =>
         @activeWorkers.splice @activeWorkers.indexOf(worker), 1
         @freeWorkers.push worker
